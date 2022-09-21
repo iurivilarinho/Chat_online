@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+   
+    <main style="align-items: center;">
+        <div style="margin-left:40em; background-color: gray; width: 50em; border-radius: 2em; height: auto;">
+
+            <h1 style="margin-left: 8em ;">Chat Online</h1>
+
+            <div style="margin-left: 4em ;">
+
+                <label for="">Nome<br>
+                    <input type="text" name="" id="nome">
+                </label>
+                <input type="button" value="Alterar Nome" id="mudaNome">
+            </div>
+    
+        <div style="margin-left: 4em ;"> 
+                <label for="">Mensagem<br>
+                    <input type="text" name="" id="mensagem" required>
+                </label>
+                <input type="button" value="Enviar" id="enviar">
+        </div>
+
+        <div style="margin-left: 1em; border-radius: 2em; display:inline-block; width: 25em;"><p id="chat"><b>Mensagens</b></p></div>
+        <div style="border-radius: 2em; display: inline-block; position:absolute; width: 25em;"><p id="logados"><b>Usuarios Logados</b></p></div>
+        </div>
+    
+    
+        
+    
+    </main>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var botao = document.getElementById('enviar');
+        var mudar = document.getElementById('mudaNome');
+        var mensagem = document.getElementById('mensagem');
+
+        //emitindo evento do front
+        botao.addEventListener('click', function(e) {
+            e.preventDefault();
+            if(mensagem.value){
+                socket.emit('chat message', mensagem.value );
+                mensagem.value = '';
+            }
+        });
+
+        mudar.addEventListener('click', function(e) {
+            e.preventDefault();
+            if(nome.value){
+                var usuario = nome.value;
+                socket.emit('mudar nome', usuario);
+            }
+        });
+
+        //escutando evento no front
+        socket.on('chat message', function(msg, usuario) {
+            var chat = document.getElementById('chat').innerHTML;
+            chat += `<p>${usuario}: ${msg}</p>`;
+            document.getElementById('chat').innerHTML = chat;           
+        });
+
+        socket.on('usuarios', function(clients) {
+            var user = document.getElementById('logados').innerHTML;
+            user += `<p>${clients}</p>`;
+            document.getElementById('logados').innerHTML = user;           
+        });
+
+    </script>
+</body>
+</html>
